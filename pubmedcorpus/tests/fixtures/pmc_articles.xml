@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Handcrafted, not fetched. Each article isolates one JATS shape so a failure
+names the cause. Real PMC responses are enormous; these stay readable.
+-->
+<pmc-articleset xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <!-- 1. Fully sectioned OA article, sec-type set, CC BY, nested subsection -->
+  <article>
+    <front>
+      <article-meta>
+        <article-id pub-id-type="pmc">7000001</article-id>
+        <article-id pub-id-type="pmid">20000001</article-id>
+        <title-group><article-title>Cardiac mechanisms in SUDEP</article-title></title-group>
+        <permissions>
+          <license license-type="open-access" xlink:href="https://creativecommons.org/licenses/by/4.0/">
+            <license-p>This is an open access article under the CC BY licence.</license-p>
+          </license>
+        </permissions>
+        <abstract><p>We reviewed cardiac mechanisms in SUDEP.</p></abstract>
+      </article-meta>
+    </front>
+    <body>
+      <sec sec-type="intro"><title>Introduction</title><p>SUDEP remains poorly understood.</p></sec>
+      <sec sec-type="materials|methods"><title>Materials and Methods</title><p>We searched PubMed.</p></sec>
+      <sec sec-type="results"><title>Results</title><p>We identified forty studies.</p></sec>
+      <sec sec-type="discussion">
+        <title>Discussion</title>
+        <p>Postictal asystole may contribute.</p>
+        <sec><title>Limitations</title><p>Our search was English only.</p></sec>
+      </sec>
+      <sec sec-type="conclusions"><title>Conclusions</title><p>Cardiac mechanisms remain unproven.</p></sec>
+    </body>
+  </article>
+
+  <!-- 2. No sec-type anywhere — classification must fall back to the title -->
+  <article>
+    <front>
+      <article-meta>
+        <article-id pub-id-type="pmc">7000002</article-id>
+        <article-id pub-id-type="pmid">20000002</article-id>
+        <title-group><article-title>Respiratory failure and SUDEP</article-title></title-group>
+        <permissions>
+          <license xlink:href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+            <license-p>Non-commercial, no derivatives.</license-p>
+          </license>
+        </permissions>
+      </article-meta>
+    </front>
+    <body>
+      <sec><title>Background</title><p>Apnoea precedes many deaths.</p></sec>
+      <sec><title>Discussion</title><p>We argue respiration is primary.</p></sec>
+    </body>
+  </article>
+
+  <!-- 3. Front matter only: in PMC but not open access. Not an error. -->
+  <article>
+    <front>
+      <article-meta>
+        <article-id pub-id-type="pmc">7000003</article-id>
+        <article-id pub-id-type="pmid">20000003</article-id>
+        <title-group><article-title>A paywalled cohort study</article-title></title-group>
+      </article-meta>
+    </front>
+  </article>
+
+  <!-- 4. Unsectioned body (editorial) and a non-Creative-Commons licence -->
+  <article>
+    <front>
+      <article-meta>
+        <article-id pub-id-type="pmc">7000004</article-id>
+        <article-id pub-id-type="pmid">20000004</article-id>
+        <title-group><article-title>Why we still argue about SUDEP</article-title></title-group>
+        <permissions>
+          <license license-type="publisher-standard">
+            <license-p>Reuse permitted with attribution.</license-p>
+          </license>
+        </permissions>
+      </article-meta>
+    </front>
+    <body>
+      <p>The field has not settled on a mechanism.</p>
+      <p>That disagreement is itself the interesting finding.</p>
+    </body>
+  </article>
+
+</pmc-articleset>

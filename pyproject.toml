@@ -1,0 +1,104 @@
+# Packaging for `pubmedcorpus`.
+#
+# **Extracted from the SUDEP review pipeline** (`BilalZonjy/SUDEP_Review_AI`, `backend/pubmedcorpus/`)
+# by `git subtree split`, so the history here is the real one, not a squashed import. That application
+# is the first consumer and installs this pinned:
+#
+#     pubmedcorpus @ git+https://github.com/BilalZonjy/pubmedcorpus.git@v0.1.0
+#
+# pip clones it, so `git` has to be present on the installing machine. Pin a tag or commit, never a
+# branch — `@main` reinstalls something different every time the branch moves, which is the whole
+# failure a pinned dependency exists to prevent.
+
+[build-system]
+# >= 77 for PEP 639 (`license` as an SPDX string, `license-files`). An older setuptools rejects the
+# `license` field below rather than ignoring it.
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pubmedcorpus"
+version = "0.1.0"
+description = "Build a corpus of biomedical papers from PubMed and PMC: entry-date sync, open-access full-text fetch, JATS parsing, and a schema where a row's existence is the has-full-text filter."
+readme = "README.md"
+requires-python = ">=3.12"
+# PEP 639: an SPDX expression, not the old `{ text = "MIT" }` table, which setuptools >= 77 rejects
+# outright. `license-files` ships the licence text in the wheel rather than only the word "MIT" in the
+# metadata. Note there is deliberately no `License ::` classifier — PEP 639 deprecates those, and
+# giving both is an error.
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Bilal Zonjy, MD" }]
+keywords = ["pubmed", "pmc", "ncbi", "jats", "corpus", "bibliometrics"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Database",
+]
+
+# **Ranges, not the exact pins the application uses.** `backend/requirements.txt` pins every version
+# exactly because it describes one deployed image; a library that did the same would be
+# uninstallable next to anything else. The floors are what this is tested against; the ceilings are
+# the next major, where a break is allowed to happen.
+dependencies = [
+    # The ORM and the two Postgres-specific constructs the schema is built on.
+    "sqlalchemy>=2.0,<3",
+    # JATS and PubMed XML. `iterparse`/XPath throughout `parse.py` and `jats.py`.
+    "lxml>=5.0,<6",
+    # `Bio.Entrez` — E-utilities with the history server. Not hand-rolled on purpose.
+    "biopython>=1.83,<2",
+    # Retry policy around NCBI's rate limits, in `ncbi.py`.
+    "tenacity>=9.0,<10",
+    # **Never imported, and required anyway**: SQLAlchemy reaches it through the `postgresql+psycopg`
+    # URL. Required rather than optional because this library is Postgres-only by construction —
+    # `on_conflict_do_update`, `JSONB`, `TSVECTOR` and a persisted generated column are all
+    # load-bearing, so there is no build of it that works on another database.
+    #
+    # **Plain `psycopg`, not `psycopg[binary]`** — psycopg's own guidance, and it matters for a
+    # library: `[binary]` forces the prebuilt wheel on every consumer, including one deliberately
+    # building against their own libpq. Choosing binary is the *application's* call, and this one's
+    # first consumer already makes it in its own `requirements.txt`.
+    "psycopg>=3.2,<4",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+# **An extra rather than a core dependency, and the reasoning is not "keep it light".** The library
+# does own its schema and ships a migration branch — but nothing here *imports* Alembic. Only
+# `migrations/versions/*.py` do, and those are executed by the `alembic` command, which cannot run
+# unless Alembic is already installed. So a core dependency would be paid by every consumer,
+# including one who only wants the JATS parser, to satisfy a tool that brings itself.
+migrations = ["alembic>=1.13,<2"]
+
+[project.urls]
+Source = "https://github.com/BilalZonjy/pubmedcorpus"
+
+# No `package-dir`: the package is a real `pubmedcorpus/` directory beside this file, so the default
+# mapping is correct. (It was needed only while this was a flat folder inside the application repo,
+# where the build root and the package root were the same directory.) Listing `packages` explicitly
+# still disables auto-discovery, which would otherwise pick up `pubmedcorpus/tests` as a package —
+# it has no `__init__.py` and is not one.
+[tool.setuptools]
+packages = ["pubmedcorpus"]
+
+# The migration scripts are **data, not modules**: `migrations/` and `migrations/versions/` have no
+# `__init__.py` — Alembic loads them by path, and giving them one would make them importable under a
+# name nothing should import. So they ship as package data or they do not ship at all, and a wheel
+# without them is a library whose tables cannot be created.
+[tool.setuptools.package-data]
+pubmedcorpus = ["migrations/versions/*.py"]
+
+# Now safe to set, unlike in the application repo — there, this file sat below `backend/pytest.ini`
+# and `pytest backend/pubmedcorpus/tests/…` would have found it first and taken the wrong directory
+# as rootdir. Here it is the only inifile.
+[tool.pytest.ini_options]
+testpaths = ["pubmedcorpus/tests"]
+addopts = "-q"
+# So `pytest` works in a fresh clone with nothing installed. Without it, pytest puts only the test
+# file's own directory on `sys.path` (there is no `__init__.py` under `tests/`), and `import
+# pubmedcorpus` would resolve only for an installed copy — which is exactly the copy a contributor
+# is *not* trying to test.
+pythonpath = ["."]

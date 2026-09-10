@@ -1,0 +1,74 @@
+# Publish to PyPI on a version tag, via Trusted Publishing.
+#
+# **No API token anywhere.** PyPI verifies a short-lived OIDC identity minted by GitHub for this
+# workflow in this repository, so there is no secret to store, leak or rotate. That is what
+# `permissions: id-token: write` is for — it is the only permission the publish job gets.
+#
+# One-time setup on PyPI, before the first run: Account → Publishing → add a pending publisher with
+# owner `BilalZonjy`, repository `pubmedcorpus`, workflow `release.yml`, environment `pypi`. Those
+# four values must match exactly or the upload is rejected.
+#
+# **Run by hand, from the Actions tab.** What gets published is whatever `version` says in
+# pyproject.toml on the branch you dispatch from — so a release is: bump the version, push, then
+# press the button. Nothing publishes as a side effect of merging.
+name: Publish
+
+# Manual only. Releasing is a decision, not a consequence of merging.
+on:
+  workflow_dispatch:
+
+jobs:
+  # A gate, not a formality: a release that cannot pass its own suite should not reach PyPI, and a
+  # PyPI version is permanent — there is no un-publishing a broken one, only a new number.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m pytest
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade build twine
+      - run: python -m build
+      # `twine check` catches metadata that PyPI would reject — a README that does not render, a
+      # malformed classifier — while it is still free to fix.
+      - run: python -m twine check dist/*
+      # The migration scripts ship as package *data*, so their absence is silent: the wheel installs
+      # and imports perfectly, then cannot create its tables. Fail here instead.
+      - name: Verify the migration branch is in the wheel
+        run: |
+          python -m zipfile -l dist/*.whl | tee /tmp/wheel.txt
+          grep -q "pubmedcorpus/migrations/versions/0001_corpus_initial.py" /tmp/wheel.txt
+          grep -q "pubmedcorpus/migrations/versions/0002_corpus_config.py" /tmp/wheel.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    # Named so PyPI's pending publisher can require it, and so releases show up in the repository's
+    # deployment history rather than only in workflow logs.
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      # **No `skip-existing`, deliberately.** Running this workflow is an explicit act, so if the
+      # version in pyproject.toml is already on PyPI the right outcome is a loud failure saying
+      # "you forgot to bump it" — not a green run that published nothing.
+      - uses: pypa/gh-action-pypi-publish@release/v1

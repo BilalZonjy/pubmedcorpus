@@ -1,0 +1,18 @@
+# Build artifacts. `python -m build` writes both; neither belongs in the repository — a package that
+# ships its own wheel invites someone to install a stale one.
+dist/
+build/
+*.egg-info/
+
+__pycache__/
+*.py[cod]
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+.venv/
+venv/
+
+.env
+.DS_Store

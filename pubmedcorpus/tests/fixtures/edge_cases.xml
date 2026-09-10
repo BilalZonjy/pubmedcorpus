@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Handcrafted, not fetched. Each record isolates one parser edge case so a
+failure names the cause. Real fetched fixtures (Phase 1d, ~50 PMIDs) sit
+alongside these and cover realistic combinations; these cover the awkward
+shapes deterministically and offline.
+-->
+<PubmedArticleSet>
+
+  <!-- 1. Structured abstract, ORCID as bare id, DOI in ELocationID -->
+  <PubmedArticle>
+    <MedlineCitation>
+      <PMID Version="1">10000001</PMID>
+      <Article>
+        <Journal>
+          <JournalIssue><PubDate><Year>2019</Year><Month>Mar</Month><Day>15</Day></PubDate></JournalIssue>
+          <Title>Epilepsia</Title>
+        </Journal>
+        <ArticleTitle>Cardiac mechanisms in <i>SUDEP</i>: a cohort study</ArticleTitle>
+        <Abstract>
+          <AbstractText Label="BACKGROUND" NlmCategory="BACKGROUND">Risk remains unclear.</AbstractText>
+          <AbstractText Label="METHODS" NlmCategory="METHODS">We followed 200 patients.</AbstractText>
+          <AbstractText Label="CONCLUSIONS" NlmCategory="CONCLUSIONS">Postictal asystole may contribute.</AbstractText>
+        </Abstract>
+        <AuthorList CompleteYN="Y">
+          <Author ValidYN="Y">
+            <LastName>Ryvlin</LastName><ForeName>Philippe</ForeName><Initials>P</Initials>
+            <Identifier Source="ORCID">0000-0001-2345-6789</Identifier>
+            <AffiliationInfo><Affiliation>CHUV, Lausanne, Switzerland.</Affiliation></AffiliationInfo>
+          </Author>
+          <Author ValidYN="Y">
+            <LastName>Tomson</LastName><ForeName>Torbjorn</ForeName><Initials>T</Initials>
+          </Author>
+        </AuthorList>
+        <ELocationID EIdType="doi" ValidYN="Y">10.1111/epi.00001</ELocationID>
+        <PublicationTypeList>
+          <PublicationType UI="D016428">Journal Article</PublicationType>
+        </PublicationTypeList>
+      </Article>
+      <MeshHeadingList>
+        <MeshHeading><DescriptorName UI="D000073767">Sudden Unexpected Death in Epilepsy</DescriptorName></MeshHeading>
+        <MeshHeading><DescriptorName UI="D004827">Epilepsy</DescriptorName></MeshHeading>
+      </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+      <History>
+        <PubMedPubDate PubStatus="entrez"><Year>2019</Year><Month>3</Month><Day>20</Day></PubMedPubDate>
+      </History>
+      <ArticleIdList>
+        <ArticleId IdType="pubmed">10000001</ArticleId>
+        <ArticleId IdType="pmc">PMC6543210</ArticleId>
+      </ArticleIdList>
+    </PubmedData>
+  </PubmedArticle>
+
+  <!-- 2. No abstract at all (editorial), single author, MedlineDate -->
+  <PubmedArticle>
+    <MedlineCitation>
+      <PMID Version="1">10000002</PMID>
+      <Article>
+        <Journal>
+          <JournalIssue><PubDate><MedlineDate>1998 Jan-Feb</MedlineDate></PubDate></JournalIssue>
+          <Title>Seizure</Title>
+        </Journal>
+        <ArticleTitle>Sudden death in epilepsy: an editorial.</ArticleTitle>
+        <AuthorList CompleteYN="Y">
+          <Author ValidYN="Y">
+            <LastName>Nashef</LastName><Initials>L</Initials>
+          </Author>
+        </AuthorList>
+        <PublicationTypeList>
+          <PublicationType UI="D016421">Editorial</PublicationType>
+        </PublicationTypeList>
+      </Article>
+    </MedlineCitation>
+    <PubmedData>
+      <History>
+        <PubMedPubDate PubStatus="pubmed"><Year>1998</Year><Month>2</Month><Day>1</Day></PubMedPubDate>
+      </History>
+      <ArticleIdList><ArticleId IdType="pubmed">10000002</ArticleId></ArticleIdList>
+    </PubmedData>
+  </PubmedArticle>
+
+  <!-- 3. OtherAbstract only (non-English), no <Abstract> -->
+  <PubmedArticle>
+    <MedlineCitation>
+      <PMID Version="1">10000003</PMID>
+      <Article>
+        <Journal>
+          <JournalIssue><PubDate><Year>2005</Year></PubDate></JournalIssue>
+          <Title>Revista de Neurologia</Title>
+        </Journal>
+        <ArticleTitle>Muerte subita en epilepsia.</ArticleTitle>
+        <AuthorList CompleteYN="Y">
+          <Author ValidYN="Y"><LastName>Garcia</LastName><ForeName>Maria</ForeName><Initials>M</Initials></Author>
+        </AuthorList>
+        <PublicationTypeList><PublicationType UI="D016428">Journal Article</PublicationType></PublicationTypeList>
+      </Article>
+      <OtherAbstract Type="Publisher" Language="spa">
+        <AbstractText>La muerte subita e inesperada en epilepsia es poco comprendida.</AbstractText>
+      </OtherAbstract>
+    </MedlineCitation>
+    <PubmedData>
+      <History><PubMedPubDate PubStatus="entrez"><Year>2005</Year><Month>6</Month><Day>1</Day></PubMedPubDate></History>
+      <ArticleIdList><ArticleId IdType="pubmed">10000003</ArticleId></ArticleIdList>
+    </PubmedData>
+  </PubmedArticle>
+
+  <!-- 4. Retracted, ORCID as URL, collective author, unstructured abstract -->
+  <PubmedArticle>
+    <MedlineCitation>
+      <PMID Version="1">10000004</PMID>
+      <Article>
+        <Journal>
+          <JournalIssue><PubDate><Year>2014</Year><Month>07</Month></PubDate></JournalIssue>
+          <Title>Journal of Dubious Findings</Title>
+        </Journal>
+        <ArticleTitle>A single biomarker predicts SUDEP.</ArticleTitle>
+        <Abstract>
+          <AbstractText>We report a biomarker with perfect discrimination.</AbstractText>
+        </Abstract>
+        <AuthorList CompleteYN="Y">
+          <Author ValidYN="Y">
+            <LastName>Wang</LastName><ForeName>Jing</ForeName><Initials>J</Initials>
+            <Identifier Source="ORCID">https://orcid.org/0000-0002-1111-222X</Identifier>
+          </Author>
+          <Author ValidYN="Y">
+            <CollectiveName>The SUDEP Study Group</CollectiveName>
+          </Author>
+        </AuthorList>
+        <PublicationTypeList>
+          <PublicationType UI="D016428">Journal Article</PublicationType>
+          <PublicationType UI="D016441">Retracted Publication</PublicationType>
+        </PublicationTypeList>
+      </Article>
+    </MedlineCitation>
+    <PubmedData>
+      <History><PubMedPubDate PubStatus="entrez"><Year>2014</Year><Month>7</Month><Day>10</Day></PubMedPubDate></History>
+      <ArticleIdList>
+        <ArticleId IdType="pubmed">10000004</ArticleId>
+        <ArticleId IdType="doi">10.9999/jdf.2014.001</ArticleId>
+      </ArticleIdList>
+    </PubmedData>
+  </PubmedArticle>
+
+  <!-- 5. No AuthorList at all, impossible date (Feb 30) -->
+  <PubmedArticle>
+    <MedlineCitation>
+      <PMID Version="1">10000005</PMID>
+      <Article>
+        <Journal>
+          <JournalIssue><PubDate><Year>2001</Year><Month>Feb</Month><Day>30</Day></PubDate></JournalIssue>
+          <Title>Anonymous Reports</Title>
+        </Journal>
+        <ArticleTitle>Untitled correspondence.</ArticleTitle>
+        <PublicationTypeList><PublicationType UI="D016422">Letter</PublicationType></PublicationTypeList>
+      </Article>
+    </MedlineCitation>
+    <PubmedData>
+      <ArticleIdList><ArticleId IdType="pubmed">10000005</ArticleId></ArticleIdList>
+    </PubmedData>
+  </PubmedArticle>
+
+</PubmedArticleSet>
