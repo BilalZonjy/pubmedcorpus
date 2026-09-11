@@ -4,7 +4,7 @@
 # by `git subtree split`, so the history here is the real one, not a squashed import. That application
 # is the first consumer and installs this pinned:
 #
-#     pubmedcorpus @ git+https://github.com/BilalZonjy/pubmedcorpus.git@v0.1.0
+#     pubmedcorpus @ git+https://github.com/BilalZonjy/pubmedcorpus.git@v0.1.1
 #
 # pip clones it, so `git` has to be present on the installing machine. Pin a tag or commit, never a
 # branch — `@main` reinstalls something different every time the branch moves, which is the whole
@@ -18,7 +18,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pubmedcorpus"
-version = "0.1.0"
+version = "0.1.1"
 description = "Build a corpus of biomedical papers from PubMed and PMC: entry-date sync, open-access full-text fetch, JATS parsing, and a schema where a row's existence is the has-full-text filter."
 readme = "README.md"
 requires-python = ">=3.12"

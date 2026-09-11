@@ -17,10 +17,30 @@ generated column are all load-bearing. There is no build of this that works on a
 
 ## Status
 
-**v0.1.0, and honestly 0.x.** One consumer so far, which is the reason the public surface is
+**v0.1.1, and honestly 0.x.** One consumer so far, which is the reason the public surface is
 deliberately small (see *What it does not do*): a library extracted before it has a second user tends
 to abstract the wrong joints, so this promises as little as it can until one exists. Expect the API to
 move before 1.0. Pin a tag.
+
+## Versions
+
+### 0.1.1
+
+**`abstract.search_tsv` now indexes MeSH terms**, at weight C — below title (A) and abstract (B),
+because a MeSH hit is a curated topical label and weaker evidence of relevance than the paper's own
+prose. A query that matches a paper's indexed subject headings now finds it even when the abstract
+phrases things differently.
+
+**One caveat if you use phrase search.** The terms are read as one string
+(`pubmed_json->>'mesh_terms'`), because a generated column's expression must be immutable and
+per-term tokenising would need `unnest`. Punctuation does not break adjacency in a `tsvector`, so
+all terms share one positional sequence and `phraseto_tsquery`/`<->` can match across the seam
+between two unrelated headings. Plain and `websearch_to_tsquery` matching is unaffected.
+
+### 0.1.0
+
+Initial extraction from the SUDEP review pipeline: sync, PMC fetch, JATS parsing, seeding,
+snapshots, and the library's own Alembic branch.
 
 ## Installing
 
@@ -40,7 +60,7 @@ exact failure a pinned dependency exists to prevent. Installing this way needs `
 slim Docker base image usually lacks:
 
 ```
-pubmedcorpus @ git+https://github.com/BilalZonjy/pubmedcorpus.git@v0.1.0
+pubmedcorpus @ git+https://github.com/BilalZonjy/pubmedcorpus.git@v0.1.1
 ```
 
 **Do not also vendor a copy.** If the package exists both in `site-packages` and in your project's own

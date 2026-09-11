@@ -38,14 +38,18 @@ branch_labels: Union[str, Sequence[str], None] = ("pubmedcorpus",)
 depends_on: Union[str, Sequence[str], None] = None
 
 
-# Title (weight A) + abstract (weight B), in `english` and `simple`. Spelled out here and again in
-# `pubmedcorpus.models.Abstract.search_tsv`, deliberately: a migration is a frozen historical record
-# and must not import from a model that keeps changing. Keep them identical if either moves.
+# Title (weight A) + abstract (weight B) + MeSH terms (weight C), in `english` and `simple`. Spelled
+# out here and again in `pubmedcorpus.models.Abstract.search_tsv`, deliberately: a migration is a
+# frozen historical record and must not import from a model that keeps changing. Keep them identical
+# if either moves — that model's comment carries the reasoning behind the weights and behind reading
+# `mesh_terms` as one string rather than per term.
 _ABSTRACT_TSV = """
     setweight(to_tsvector('english', coalesce(pubmed_json->>'title', '')), 'A')
  || setweight(to_tsvector('english', coalesce(pubmed_json->>'abstract_text', '')), 'B')
+ || setweight(to_tsvector('english', coalesce(pubmed_json->>'mesh_terms', '')), 'C')
  || setweight(to_tsvector('simple',  coalesce(pubmed_json->>'title', '')), 'A')
  || setweight(to_tsvector('simple',  coalesce(pubmed_json->>'abstract_text', '')), 'B')
+ || setweight(to_tsvector('simple',  coalesce(pubmed_json->>'mesh_terms', '')), 'C')
 """
 
 

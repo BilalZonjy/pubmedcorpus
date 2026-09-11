@@ -73,7 +73,11 @@ class Abstract(Base):
     # it had a PMCID but no open-access body, so an embargo may since have lifted.
     fetch_failed: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
 
-    # Title (weight A) + abstract (weight B), in `english` and `simple`.
+    # Title (weight A) + abstract (weight B) + MeSH terms (weight C), in `english` and `simple`.
+    #
+    # MeSH sits *below* the abstract deliberately: it is a curated topical label, so a hit there is
+    # weaker evidence of relevance than the paper's own prose — ranking it above the abstract would
+    # float topic-adjacent papers over ones that actually discuss the query.
     #
     # **Known wart, kept deliberately: this is a consumer concern living on a library model.** It
     # exists to serve a lexical retrieval path in the application that first needed it, not anything
@@ -91,13 +95,25 @@ class Abstract(Base):
     #
     # The expression is spelled out here and again in the migration, deliberately: a migration is
     # a frozen historical record and must not import from a model that keeps changing.
+    #
+    # `pubmed_json->>'mesh_terms'` hands the whole array over as one string — `["Epilepsy",
+    # "Death, Sudden"]` — whose brackets, quotes and commas tokenise to nothing. Done this way
+    # because a generated column's expression must be immutable, which rules out the `unnest` that
+    # per-term tokenising would need. **The cost: every MeSH term shares one positional sequence,
+    # and punctuation does not break adjacency in a tsvector, so a phrase query (`<->`,
+    # `phraseto_tsquery`) can match across the seam between two unrelated terms — "epilepsy death"
+    # from the example above.** Harmless to the plain `websearch_to_tsquery` matching the one
+    # consumer does, and weight C limits the ranking damage; a consumer that wants phrase search
+    # over MeSH needs a normalised term table instead, not a fix to this column.
     search_tsv: Mapped[str | None] = mapped_column(
         TSVECTOR,
         Computed(
             "setweight(to_tsvector('english', coalesce(pubmed_json->>'title', '')), 'A')"
             " || setweight(to_tsvector('english', coalesce(pubmed_json->>'abstract_text', '')), 'B')"
+            " || setweight(to_tsvector('english', coalesce(pubmed_json->>'mesh_terms', '')), 'C')"
             " || setweight(to_tsvector('simple',  coalesce(pubmed_json->>'title', '')), 'A')"
-            " || setweight(to_tsvector('simple',  coalesce(pubmed_json->>'abstract_text', '')), 'B')",
+            " || setweight(to_tsvector('simple',  coalesce(pubmed_json->>'abstract_text', '')), 'B')"
+            " || setweight(to_tsvector('simple',  coalesce(pubmed_json->>'mesh_terms', '')), 'C')",
             persisted=True,
         ),
         deferred=True,
