@@ -8,7 +8,7 @@ import dataclasses
 import logging
 from datetime import date
 
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
@@ -112,10 +112,14 @@ def paper_values(parsed: ParsedPaper) -> dict:
 def upsert_abstract(session: Session, parsed: ParsedPaper) -> None:
     """Write one PubMed record, and refresh a promoted paper's citation if it has one."""
     stmt = insert(Abstract).values(**abstract_values(parsed))
-    stmt = stmt.on_conflict_do_update(
-        index_elements=[Abstract.pmid],
-        set_={c: getattr(stmt.excluded, c) for c in _ABSTRACT_UPDATE_COLS},
-    )
+    set_ = {c: getattr(stmt.excluded, c) for c in _ABSTRACT_UPDATE_COLS}
+    # Touched explicitly, and it has to be: the model's `onupdate=func.now()` never reaches an
+    # ON CONFLICT DO UPDATE clause — SQLAlchemy writes exactly the columns named here — so without
+    # this line the column stays frozen at first insert and silently misreports when the row changed.
+    # Beside the comprehension rather than inside `_ABSTRACT_UPDATE_COLS`, which means content
+    # refreshed from the new parse; this is bookkeeping.
+    set_["updated_at"] = func.now()
+    stmt = stmt.on_conflict_do_update(index_elements=[Abstract.pmid], set_=set_)
     session.execute(stmt)
 
     # A promoted paper's citation was rendered from the XML we may have just replaced.

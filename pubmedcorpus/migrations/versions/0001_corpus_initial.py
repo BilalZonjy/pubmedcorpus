@@ -80,8 +80,14 @@ def upgrade() -> None:
         # With the `paper` row, this gives three states and needs no enum: no paper row
         # and not failed = never attempted; failed = asked, no body; paper row = have it.
         sa.Column("fetch_failed", sa.Boolean(), nullable=False, server_default=sa.false()),
-        sa.Column("ingested_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        # NOT NULL because the server default fills both on every insert, so no row can reach NULL
+        # — and because the model declares them non-Optional, which is a promise the table has to keep.
+        sa.Column(
+            "ingested_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
     )
     op.create_index("ix_abstract_pub_year", "abstract", ["pub_year"])
     op.create_index("ix_abstract_entry_date", "abstract", ["entry_date"])

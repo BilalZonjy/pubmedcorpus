@@ -34,7 +34,7 @@ from typing import Any
 
 from pubmedcorpus.db import Base
 from sqlalchemy import (Boolean, Computed, Date, DateTime, Float, ForeignKey,
-                        Integer, String, Text, func)
+                        Index, Integer, String, Text, func)
 from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -47,6 +47,16 @@ class Abstract(Base):
     """
 
     __tablename__ = "abstract"
+
+    # **Declared here only so autogenerate can see it.** The index itself is created by raw DDL in
+    # `0001`, beside the generated column it covers — neither is something the model can create, since
+    # `Computed` produces the column but `index=True` would produce a btree. Without this declaration
+    # the index exists in the database and nowhere in the metadata, and every consumer's
+    # `alembic revision --autogenerate` proposes dropping it. Name and access method must match that
+    # DDL exactly or the comparison turns into a drop-and-recreate instead of a no-op.
+    __table_args__ = (
+        Index("ix_abstract_search_tsv", "search_tsv", postgresql_using="gin"),
+    )
 
     pmid: Mapped[str] = mapped_column(String(20), primary_key=True)
 
