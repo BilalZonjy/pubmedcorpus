@@ -17,12 +17,20 @@ generated column are all load-bearing. There is no build of this that works on a
 
 ## Status
 
-**v0.1.1, and honestly 0.x.** One consumer so far, which is the reason the public surface is
+**v0.1.2, and honestly 0.x.** One consumer so far, which is the reason the public surface is
 deliberately small (see *What it does not do*): a library extracted before it has a second user tends
 to abstract the wrong joints, so this promises as little as it can until one exists. Expect the API to
 move before 1.0. Pin a tag.
 
 ## Versions
+
+### 0.1.2
+
+Three fixes where made.
+
+- **`ingested_at` and `updated_at` are `NOT NULL`**
+- **`ix_abstract_search_tsv` is declared on the models.** 
+- **`abstract.updated_at` advances on re-sync.** 
 
 ### 0.1.1
 
@@ -60,7 +68,7 @@ exact failure a pinned dependency exists to prevent. Installing this way needs `
 slim Docker base image usually lacks:
 
 ```
-pubmedcorpus @ git+https://github.com/BilalZonjy/pubmedcorpus.git@v0.1.1
+pubmedcorpus @ git+https://github.com/BilalZonjy/pubmedcorpus.git@v0.1.2
 ```
 
 **Do not also vendor a copy.** If the package exists both in `site-packages` and in your project's own
